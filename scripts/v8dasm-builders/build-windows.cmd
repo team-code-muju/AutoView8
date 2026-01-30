@@ -67,20 +67,42 @@ REM 应用补丁
 echo =====[ Applying v8.patch ]=====
 set PATCH_FILE=%WORKSPACE_DIR%\Disassembler\v8.patch
 
+echo Checking patch file: %PATCH_FILE%
+if not exist "%PATCH_FILE%" (
+    echo ERROR: Patch file not found at %PATCH_FILE%
+    exit /b 1
+)
+
+echo Patch file exists, attempting to apply...
 git apply --check %PATCH_FILE% >nul 2>&1
 if %errorlevel% equ 0 (
+    echo Applying patch...
     git apply --verbose %PATCH_FILE%
-    echo Patch applied successfully
+    if %errorlevel% equ 0 (
+        echo Patch applied successfully
+    ) else (
+        echo ERROR: Failed to apply patch
+        git apply %PATCH_FILE%
+        exit /b 1
+    )
 ) else (
+    echo Patch cannot be applied cleanly, checking if already applied...
     git apply --check --reverse %PATCH_FILE% >nul 2>&1
     if %errorlevel% equ 0 (
         echo Patch already applied, skipping
     ) else (
         echo Attempting 3-way merge...
-        git apply -3 %PATCH_FILE%
+        git apply -3 %PATCH_FILE% 2>&1
         if !errorlevel! neq 0 (
-            git apply --ignore-whitespace %PATCH_FILE%
+            echo 3-way merge failed, trying with --ignore-whitespace...
+            git apply --ignore-whitespace %PATCH_FILE% 2>&1
+            if !errorlevel! neq 0 (
+                echo ERROR: All patch methods failed. Showing patch check output:
+                git apply --check %PATCH_FILE%
+                exit /b 1
+            )
         )
+        echo Patch applied with fallback method
     )
 )
 

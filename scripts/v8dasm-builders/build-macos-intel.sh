@@ -66,6 +66,14 @@ gclient sync
 echo "=====[ Applying v8.patch ]====="
 PATCH_FILE="$WORKSPACE_DIR/Disassembler/v8.patch"
 
+# 检查补丁文件是否存在
+if [ ! -f "$PATCH_FILE" ]; then
+    echo "ERROR: Patch file not found at $PATCH_FILE"
+    exit 1
+fi
+
+echo "Patch file exists, attempting to apply..."
+
 if git apply --check $PATCH_FILE 2>/dev/null; then
     git apply --verbose $PATCH_FILE
     echo "Patch applied successfully"
@@ -73,7 +81,15 @@ elif git apply --check --reverse $PATCH_FILE 2>/dev/null; then
     echo "Patch already applied, skipping"
 else
     echo "Attempting 3-way merge..."
-    git apply -3 $PATCH_FILE || git apply --ignore-whitespace $PATCH_FILE
+    git apply -3 $PATCH_FILE || {
+        echo "WARNING: Patch failed with conflicts. Attempting with --ignore-whitespace..."
+        git apply --ignore-whitespace $PATCH_FILE || {
+            echo "ERROR: Failed to apply patch. Showing patch check output:"
+            git apply --check $PATCH_FILE
+            exit 1
+        }
+    }
+    echo "Patch applied with fallback method"
 fi
 
 # 配置构建
