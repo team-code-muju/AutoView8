@@ -65,7 +65,7 @@ call gclient sync
 
 REM 应用补丁
 echo =====[ Applying v8.patch ]=====
-set PATCH_FILE=%WORKSPACE_DIR%\view8-jsc-decode\Disassembler\v8.patch
+set PATCH_FILE=%WORKSPACE_DIR%\Disassembler\v8.patch
 
 git apply --check %PATCH_FILE% >nul 2>&1
 if %errorlevel% equ 0 (
@@ -94,7 +94,7 @@ call ninja -C out.gn\x64.release v8_monolith
 
 REM 编译 v8dasm
 echo =====[ Compiling v8dasm ]=====
-set DASM_SOURCE=%WORKSPACE_DIR%\view8-jsc-decode\Disassembler\v8dasm.cpp
+set DASM_SOURCE=%WORKSPACE_DIR%\Disassembler\v8dasm.cpp
 set OUTPUT_NAME=v8dasm-%V8_VERSION%.exe
 
 clang++ %DASM_SOURCE% ^

@@ -64,7 +64,7 @@ gclient sync
 
 # 应用补丁
 echo "=====[ Applying v8.patch ]====="
-PATCH_FILE="$WORKSPACE_DIR/view8-jsc-decode/Disassembler/v8.patch"
+PATCH_FILE="$WORKSPACE_DIR/Disassembler/v8.patch"
 
 if git apply --check $PATCH_FILE 2>/dev/null; then
     git apply --verbose $PATCH_FILE
@@ -100,7 +100,7 @@ ninja -C out.gn/x64.release v8_monolith
 
 # 编译 v8dasm
 echo "=====[ Compiling v8dasm ]====="
-DASM_SOURCE="$WORKSPACE_DIR/view8-jsc-decode/Disassembler/v8dasm.cpp"
+DASM_SOURCE="$WORKSPACE_DIR/Disassembler/v8dasm.cpp"
 OUTPUT_NAME="v8dasm-$V8_VERSION"
 
 clang++ $DASM_SOURCE \
