@@ -56,6 +56,7 @@ if not exist v8 (
 )
 
 cd v8
+set V8_DIR=%CD%
 
 REM Checkout 指定版本
 echo =====[ Checking out V8 %V8_VERSION% ]=====

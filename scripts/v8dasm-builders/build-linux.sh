@@ -72,6 +72,7 @@ if [ ! -d "v8" ]; then
 fi
 
 cd v8
+V8_DIR=$(pwd)
 
 # Checkout 指定版本
 echo "=====[ Checking out V8 $V8_VERSION ]====="
