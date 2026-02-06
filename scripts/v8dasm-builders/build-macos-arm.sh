@@ -85,33 +85,18 @@ echo "✅ Patch applied successfully"
 
 # 配置构建 (ARM64)
 echo "=====[ Configuring V8 Build for ARM64 ]====="
-# 第一步：创建基础配置
-python3 tools/dev/v8gen.py arm64.release
+# 构建 GN 参数字符串
+GN_ARGS='target_os="mac" target_cpu="arm64" is_component_build=false is_debug=false use_custom_libcxx=false v8_monolithic=true v8_static_library=true v8_enable_disassembler=true v8_enable_object_print=true v8_use_external_startup_data=false dcheck_always_on=false symbol_level=0'
 
-# 第二步：编辑 args.gn 文件
-echo "=====[ Writing build configuration to args.gn ]====="
-cat > out.gn/arm64.release/args.gn << 'EOF'
-target_os = "mac"
-target_cpu = "arm64"
-is_component_build = false
-is_debug = false
-use_custom_libcxx = false
-v8_monolithic = true
-v8_static_library = true
-v8_enable_disassembler = true
-v8_enable_object_print = true
-v8_use_external_startup_data = false
-dcheck_always_on = false
-symbol_level = 0
-EOF
-
-# 如果有额外的构建参数，追加到 args.gn
+# 如果有额外的构建参数，追加
 if [ -n "$BUILD_ARGS" ]; then
-    echo "$BUILD_ARGS" >> out.gn/arm64.release/args.gn
+    GN_ARGS="$GN_ARGS $BUILD_ARGS"
 fi
 
-echo "Build configuration:"
-cat out.gn/arm64.release/args.gn
+echo "GN Args: $GN_ARGS"
+
+# 直接使用 gn gen 生成构建配置
+gn gen out.gn/arm64.release --args="$GN_ARGS"
 
 # 构建 V8 静态库
 echo "=====[ Building V8 Monolith ]====="
